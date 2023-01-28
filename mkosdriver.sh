@@ -9,7 +9,8 @@
 # Windows zip files do not contain 'include' directory.
 # Get include directory for Windows by installing dsdriver on Windows and
 # then add include dir into 64bit and 32bit windows driver.
-# DSDriver Install cmd: v11.5.4_ntx64_dsdriver_EN.exe /n v1154 /p C:\DSD1154
+# DSDriver Install cmd: v11.5.8_ntx64_dsdriver_EN.exe /n v1158sb /p C:\\DSD1158SB
+# Copy include dir and security dir files from dsdriver to clidriver on windows
 # Also, update db2cli.lst file on Windows manually for LFCR.
 
 echo "Making odbc_cli.tar.gz for open source drivers ..."
@@ -154,17 +155,19 @@ function mkntdriver {
   echo "Making ${zipname}"
   cd "${dir}/clidriver/bin"
   if [ "$osdplat" = "ntx64" ]; then
-    rm -rf icc  x86.VC12.CRT db2app.dll db2cli.dll db2cli32.exe db2clio.dll db2clixml4c.dll db2diag.exe db2drdat.exe db2dsdcfgfill.exe db2ldap.dll db2ldapm.dll db2ldcfg.exe
+    rm -rf icc  x86.VC12.CRT db2app.dll db2cli.dll db2cli32.exe db2clio.dll db2clixml4c.dll db2diag.exe db2drdat.exe db2dsdcfgfill.exe db2ldap.dll db2ldapm.dll db2ldcfg.exe ibmdadb264.dll
     rm -rf db2odbc.dll db2odbc64.dll db2odbch.dll db2odbch64.dll db2oreg1.exe db2oreg132.exe db2osse.dll db2trc32.exe db2trcapi.dll db2trcd.exe 
     rm -rf DB2xml4c_cli_5_8.dll DB2xml4c_cli_5_8.dll.2.manifest IBM.DB2.APP.manifest IBM.DB2.CLI.manifest IBM.DB2.CLIO.manifest  IBM.DB2.CLIXML4C.manifest
-    rm -rf IBM.DB2.LDAP.manifest IBM.DB2.LDAPM.manifest IBM.DB2.ODBC.manifest IBM.DB2.ODBC64.manifest IBM.DB2.ODBCH.manifest IBM.DB2.ODBCH64.manifest
+    rm -rf IBM.DB2.LDAP.manifest IBM.DB2.LDAPM.manifest IBM.DB2.ODBC.manifest IBM.DB2.ODBCH.manifest IBM.DB2.ODBC64.manifest IBM.DB2.ODBCH64.manifest
     rm -rf IBM.DB2.SEC.manifest IBMIAMauth.dll IBMkrb5.dll IBMkrb5TwoPart.dll IBMLDAPauthclient.dll IBMOSauthclient.dll IBMOSauthclientTwoPart.dll
 
     cd ../lib
     rm -rf db2app.lib db2cli.lib db2clio.lib
+    mv ../security64 ../security
   else
-    rm -rf db2diag.exe db2drdat.exe db2dsdcfgfill.exe db2ldcfg.exe db2odbch.dll
-    rm -rf db2odbc.dll db2oreg1.exe IBM.DB2.ODBC.manifest IBM.DB2.ODBCH.manifest
+    rm -rf db2diag.exe db2drdat.exe db2dsdcfgfill.exe db2ldcfg.exe db2oreg1.exe
+    rm -rf db2odbc.dll db2odbch.dll IBM.DB2.ODBC.manifest IBM.DB2.ODBCH.manifest
+    mv ../security32 ../security
   fi
 
   if [ -e $dir/clidriver/bnd ]; then
@@ -180,8 +183,8 @@ function mkntdriver {
   cd $dir/clidriver/msg/en_US
   rm -rf *.CRT *dll* db2nmp.xml db2diag.mo
   cd $dir
-  rm -rf $tarname
-  zip -rq ${osdplat}_odbc_cli clidriver
+  rm -rf $zipname
+  zip -9yrq ${osdplat}_odbc_cli clidriver
 }
 
 mkLinuxDriver
