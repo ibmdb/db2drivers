@@ -29,7 +29,7 @@
    install_name_tool -id libDB2xml4c.58.0.dylib libDB2xml4c.58.0.dylib
    install_name_tool -id libdb2.dylib libdb2.dylib
 
-   chmod 555 *
+   chmod 555 libdb2.dylib libdb2clixml4c.dylib libDB2xml4c.58.0.dylib
    cd ../..
    tar -zcf macos64_odbc_cli.tar.gz clidriver
    rm -f ibm_data_server_driver_for_odbc_cli.tar.gz
