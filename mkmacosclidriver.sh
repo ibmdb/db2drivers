@@ -21,10 +21,10 @@
    ln -s libDB2xml4c.58.0.dylib libDB2xml4c.58.dylib
    ln -s libDB2xml4c.58.0.dylib libDB2xml4c.dylib
    chmod 775 *
-   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib /usr/local/lib/gcc/8/libstdc++.6.dylib  libdb2.dylib
+   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib @loader_path/libstdc++.6.dylib libdb2.dylib
    install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libgcc_s.1.dylib /usr/local/lib/gcc/8/libgcc_s.1.dylib  libdb2.dylib
    install_name_tool -change /Users/regress1/db2/engn/lib/bldsupp/libDB2xml4c.58.0.dylib @loader_path/libDB2xml4c.58.0.dylib libdb2clixml4c.dylib
-   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib /usr/local/lib/gcc/8/libstdc++.6.dylib libdb2clixml4c.dylib
+   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib @loader_path/libstdc++.6.dylib libdb2clixml4c.dylib
    install_name_tool -id libdb2clixml4c.dylib libdb2clixml4c.dylib
    install_name_tool -id libDB2xml4c.58.0.dylib libDB2xml4c.58.0.dylib
    install_name_tool -id libdb2.dylib libdb2.dylib
