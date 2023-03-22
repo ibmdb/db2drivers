@@ -15,21 +15,29 @@
    hdiutil detach /Volumes/dsdriver/
    sanitizeClidriver
 #   cp clidriver_pre/lib/libstdc++.6.dylib clidriver/lib
-   cp libstdc++.6.dylib clidriver/lib
+#   cp libstdc++.6.dylib clidriver/lib
    cd clidriver/lib
    rm -f libdb2o.dylib libDB2xml4c.58.dylib libDB2xml4c.dylib 
    ln -s libDB2xml4c.58.0.dylib libDB2xml4c.58.dylib
    ln -s libDB2xml4c.58.0.dylib libDB2xml4c.dylib
    chmod 775 *
-   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib @loader_path/libstdc++.6.dylib libdb2.dylib
+   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib /usr/local/lib/gcc/8/libstdc++.6.dylib libdb2.dylib
    install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libgcc_s.1.dylib /usr/local/lib/gcc/8/libgcc_s.1.dylib  libdb2.dylib
    install_name_tool -change /Users/regress1/db2/engn/lib/bldsupp/libDB2xml4c.58.0.dylib @loader_path/libDB2xml4c.58.0.dylib libdb2clixml4c.dylib
-   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib @loader_path/libstdc++.6.dylib libdb2clixml4c.dylib
+   install_name_tool -change /usr/local/opt/gcc@8/lib/gcc/8/libstdc++.6.dylib /usr/local/lib/gcc/8/libstdc++.6.dylib libdb2clixml4c.dylib
    install_name_tool -id libdb2clixml4c.dylib libdb2clixml4c.dylib
    install_name_tool -id libDB2xml4c.58.0.dylib libDB2xml4c.58.0.dylib
    install_name_tool -id libdb2.dylib libdb2.dylib
 
    chmod 555 libdb2.dylib libdb2clixml4c.dylib libDB2xml4c.58.0.dylib
+   cd ../bin
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2cli
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2diag
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2drdat
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2dsdcfgfill
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2level
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2support
+   install_name_tool -change ../lib/libdb2.dylib @loader_path/../lib/libdb2.dylib db2trc
    cd ../..
    tar -zcf macos64_odbc_cli.tar.gz clidriver
    rm -f ibm_data_server_driver_for_odbc_cli.tar.gz
