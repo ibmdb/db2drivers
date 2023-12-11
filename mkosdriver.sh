@@ -3,7 +3,7 @@
 # Download 64bit dsdriver for non-windows platforms
 # Copy libibmc++.so.1 from oemtools for os390 platforms
 
-# Make macos driver on Mac System only.
+# Make macos driver on Mac System only using mkmacosclidriver.sh script.
 
 # For Windows, download 64bit and 32bit odbc_cli driver zip file. These
 # Windows zip files do not contain 'include' directory.
@@ -13,14 +13,17 @@
 # Copy include dir and security dir files from dsdriver to clidriver on windows
 # Also, update db2cli.lst file on Windows manually for LFCR.
 
-echo "Making odbc_cli.tar.gz for open source drivers ..."
+echo "Making odbc_cli.tar.gz for open source drivers from dsdriver.tar.gz file ..."
+echo "Please enter the tar.gz file prefix as project ex. special_36648_v11.5.9"
+read -p "PROJECT = " project
+#project="special_36648_v11.5.9"
 
-project="special_26260_v11.5.8"
 clidplat="linuxamd64"
 osdplat="linuxx64"
 dir=`pwd`
 bit="64"
 ibmclid="${dir}/dsdriver/odbc_cli_driver/${clidplat}/ibm_data_server_driver_for_odbc_cli.tar.gz"
+mkdir $dir/$project
 
 function getclidriver {
   cd $dir
@@ -39,12 +42,24 @@ function getclidriver {
     echo "db2clipk.bnd+" >> db2cli.lst
     echo "db2clist.bnd+" >> db2cli.lst
     echo "db2cli.bnd" >> db2cli.lst
-    chmod 555 db2cli.lst
+    chmod 755 *
+    chmod 775 db2cli.lst
+  fi
+  if [ -e $dir/clidriver/db2dump ]; then
+    cd $dir/clidriver/db2dump
+    echo -n "" > db2diag.log
+    chmod 664 db2diag.log
   fi
   cd $dir/clidriver 
   mv adm/* bin
   rm -rf adm
   rm -rf lib/*db2o.*
+  # copy script files
+  mkdir scripts
+  cp $dir/scripts/testconnection.sh scripts
+  cp $dir/scripts/setenv.sh scripts
+  chmod 775 * scripts/*
+  chmod 755 bin/* lib/* cfg/*
   cd $dir
   if [ "$osdplat" = "s390x64" ]; then
     cd clidriver/lib
@@ -62,8 +77,9 @@ function getclidriver {
     cd $dir
   fi
   rm -rf $tarname
-  tar czf $tarname clidriver
-  ls -l $tarname
+  tar --preserve-permissions --xattrs -czf $tarname clidriver
+  mv $tarname $project
+  ls -l $project/$tarname
   ls clidriver
   ls -l clidriver/lib
 }
@@ -146,7 +162,12 @@ function mkWindowsDriver {
 
   echo ""
   ls -l *odbc_cli.zip
-  echo ""
+  echo "
+    Windows zip files do not contain 'include' directory and IBMIAMauth64.dll.
+    Get these file for Windows by installing dsdriver on Windows and
+    then add include dir into 64bit and 32bit windows driver.
+    DSDriver Install cmd: v11.5.8_ntx64_dsdriver_EN.exe /n v1158sb /p C:\\DSD1158SB
+    "
 }
 
 function mkntdriver {
@@ -173,18 +194,29 @@ function mkntdriver {
   if [ -e $dir/clidriver/bnd ]; then
     cd $dir/clidriver/bnd
     rm -rf *.lst
-    echo "db2ajgrt.bnd+" > db2cli.lst
-    echo "db2clipk.bnd+" >> db2cli.lst
-    echo "db2clist.bnd+" >> db2cli.lst
-    echo "db2cli.bnd" >> db2cli.lst
-    chmod 555 db2cli.lst
+    echo "db2ajgrt.bnd+\r" > db2cli.lst
+    echo "db2clipk.bnd+\r" >> db2cli.lst
+    echo "db2clist.bnd+\r" >> db2cli.lst
+    echo "db2cli.bnd\r" >> db2cli.lst
+    chmod 775 *
   fi
-
+  # copy script files
+  cd "${dir}/clidriver"
+  mkdir scripts
+  cp $dir/scripts/testconnection.bat scripts
+  cp $dir/scripts/setenv.bat scripts
+  chmod 775 * scripts/*
+  chmod 775 license/* cfg/* lib/* bin/* db2/*
   cd $dir/clidriver/msg/en_US
   rm -rf *.CRT *dll* db2nmp.xml db2diag.mo
+  chmod 775 *
   cd $dir
   rm -rf $zipname
   zip -9yrq ${osdplat}_odbc_cli clidriver
+  mv $zipname $project
+  ls -l $project/$zipname
+  ls clidriver
+  ls -l clidriver/lib
 }
 
 mkLinuxDriver
