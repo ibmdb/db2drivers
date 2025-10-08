@@ -100,6 +100,10 @@ if [[ "$filename" =~ _dsdriver.tar.gz$ ]]; then
     createLUDriver=1
 fi
 
+# Rename existing clidriver directory
+if [ -e $dir/clidriver ]; then
+    mv $dir/clidriver $dir/clidriver-original
+fi
 
 # Define Functions to create clidriver
 # ====================================
@@ -405,6 +409,11 @@ fi
 
 # Clean up
 rm -rf odbc.tar.gz dsdriver clidriver
+# Restore original clidriver directory
+if [ -e $dir/clidriver-original ]; then
+    mv $dir/clidriver-original $dir/clidriver
+fi
+
 echo ""
 echo "Done!"
 echo ""
