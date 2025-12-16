@@ -6,12 +6,13 @@
 # Update database connection string in below command and run using "./testconnection.sh" command
 
 connStr="DATABASE=sample;HOSTNAME=dbserver.host.com;PORT=50000;UID=dbuser;PWD=dbpasswd;"
+serverIsZOSoriSeries=0
 
 # For SSL connection, use below connection string - comment above line and uncomment below one
 #connStr="DATABASE=sample;HOSTNAME=db2server.host.com;PORT=50000;UID=dbuser;PWD=dbpass;SECURITY=SSL;SSLServerCertificate=/full/path/of/certificateFile.arm;"
 
 
-if [ "$IBM_DB_HOME" == "" ]
+if [ "$IBM_DB_HOME" = "" ]
 then
   IBM_DB_HOME=`pwd`/clidriver
 else
@@ -20,7 +21,7 @@ fi
 OS=`uname`
 
 export PATH=$IBM_DB_HOME/bin:$IBM_DB_HOME/adm:$IBM_DB_HOME/lib:$PATH
-if [ "$OS" == "Darwin" ]
+if [ "$OS" = "Darwin" ]
 then
   export DYLD_LIBRARY_PATH=$IBM_DB_HOME/lib:$DYLD_LIBRARY_PATH
 else
@@ -28,7 +29,7 @@ else
 fi
 
 rm -rf 1.trc 1.flw 1.fmt 1.fmtc 1.cli 1.txt
-if [ "$OS" == "Darwin" ]
+if [ "$OS" = "Darwin" ]
 then
   db2trc on -t -l 2m
 else
@@ -37,16 +38,23 @@ fi
 sleep 5
 
 # ACTUAL COMMAND
-db2cli validate -connstring "$connStr" -connect | tee 1.txt
+if [ $serverIsZOSoriSeries -eq 1 ]
+then
+  # For z/OS or iSeries server, use below command to test connection
+  db2cli validate -connstring "$connStr"  -connect -displaylic | tee 1.txt
+else
+  # For LUW server, use below command to test connection
+  db2cli validate -connstring "$connStr" -connect | tee 1.txt
+fi
 
 # You can use either above db2cli command to test full connection string or
 # below command to test TCPIP connection.
 # Keep only one and comment other. Better to use above validate command.
 #db2cli validate -database "sample:hotel.torolab.ibm.com:21169" -connect -user newton -passwd serverpass
 
-if [ "$OS" == "Darwin" ]
+if [ "$OS" = "Darwin" ]
 then
-db2trc dump 1.trc
+  db2trc dump 1.trc
 fi
 db2trc off
 db2trc flw -t 1.trc 1.flw

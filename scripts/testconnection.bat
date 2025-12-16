@@ -6,6 +6,7 @@
 @ECHO OFF
 :: Update your database connection string in below command and run this file:
 set connStr="DATABASE=sample;HOSTNAME=db2server.host.com;PORT=50000;UID=dbuser;PWD=dbpass;"
+set serverIsZOSoriSeries=0
 
 :: For SSL connection, use below connection string - comment above line and uncomment below one
 :: set connStr="DATABASE=sample;HOSTNAME=db2server.host.com;PORT=50000;UID=dbuser;PWD=dbpass;SECURITY=SSL;SSLServerCertificate=C:\\full\\path\\of\\certificate.file;"
@@ -19,7 +20,13 @@ SET LIB=%IBM_DB_HOME%\lib;%LIB%
 DEL /F 1.trc 1.flw 1.fmt 1.fmtc 1.cli
 db2trc on -t -f 1.trc
 
-db2cli validate -connstring %connStr%  -connect
+if "%serverIsZOSoriSeries%"=="1" (
+    :: For z/OS or iSeries server, use below command to test connection
+    db2cli validate -connstring %connStr%  -connect -displaylic
+) else (
+    :: For LUW server, use below command to test connection
+    db2cli validate -connstring %connStr%  -connect
+)
 :: You can use either above db2cli command to test full connection string
 :: including SSL connection or run below command to test TCPIP connection.
 :: Keep only one and comment other. Better to use above validate command.
